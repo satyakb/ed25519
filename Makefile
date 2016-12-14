@@ -17,11 +17,22 @@ point_add_lut: setup
 
 seq_mult: setup
 	rm -f outputs/seq_mult_tb.out
-	iverilog -o outputs/seq_mult_tb.out src/seq_mult.v src/seq_mult_tb.v
+	iverilog -o outputs/seq_mult_tb.out src/seq_mod_25519.v src/seq_mult.v src/seq_mult_tb.v
 	outputs/seq_mult_tb.out
 
 seq_mult_lut: setup
-	$(CC) $(CFLAGS) src/seq_mult.v
+	$(CC) $(CFLAGS) src/seq_mod_25519.v src/seq_mult.v
+	# yosys -p "synth_ice40 -abc2 -blif outputs/test.blif" src/point_add.v
+	# sleep 1
+	arachne-pnr outputs/test.blif -o outputs/test.txt -d 8k
+
+seq_mod_25519: setup
+	rm -f outputs/seq_mod_25519_tb.out
+	iverilog -o outputs/seq_mod_25519_tb.out src/seq_mod_25519.v src/seq_mod_25519_tb.v
+	outputs/seq_mod_25519_tb.out
+
+seq_mod_25519_lut: setup
+	$(CC) $(CFLAGS) src/seq_mod_25519.v
 	# yosys -p "synth_ice40 -abc2 -blif outputs/test.blif" src/point_add.v
 	# sleep 1
 	arachne-pnr outputs/test.blif -o outputs/test.txt -d 8k

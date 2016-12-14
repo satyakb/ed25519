@@ -291,11 +291,11 @@ module seq_mult_256bit (
   input         start
 );
 
-  reg     [`b2-1:0] product;
-  reg     [`b-1:0] multiplicand;
-  reg     [`b-1:0] delay;
+  reg [`b2-1:0] product;
+  reg [`b-1:0] multiplicand;
+  reg [`b-1:0] delay;
 
-  wire    [`b:0] sum = {1'b0, product[`b2-1:`b]} + {1'b0, multiplicand};
+  wire [`b:0] sum = {1'b0, product[`b2-1:`b]} + {1'b0, multiplicand};
 
   assign done = delay[0];
 

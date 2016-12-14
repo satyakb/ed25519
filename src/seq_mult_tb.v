@@ -32,7 +32,7 @@ reg         start;
 
 seq_mult_256bit seq (
   .product(product),
-  .done(done),
+  .done2(done),
   .a(a),
   .b(b),
   .start(start),
@@ -44,14 +44,17 @@ initial begin
   clk = 1'b0;
 
   @(negedge clk);
-  a = `b'b10;
-  b = `b'b10;
+  a = `b'd0;
+  a[`b-1] = 1'b1;
+  b = `b'd54;
   start = 1;
+  $display("a: %0x", a);
+  $display("b: %0d", b);
 
   @(negedge clk);
   start = 0;
 
-  @(negedge done);
+  @(posedge done);
   $display("x3: %0d", product);
   $display("done: %d", done);
 
