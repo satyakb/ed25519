@@ -88,12 +88,14 @@ module point_add (
 
     case (state)
       INIT: begin
+        done = 0;
         if (start) begin
+//          $display("point_add");
           x3 <= `b'd0;
           y3 <= `b'd0;
           z3 <= `b'd0;
           t3 <= `b'd0;
-          done <= 0;
+//          done <= 0;
           need_add <= 4'b1000;
           need_mult <= 0;
           state = OPA;
@@ -200,7 +202,7 @@ module point_add (
           $display("F: %0d", F);
           $display("G: %0d", G);
           mult1 <= E;
-          mult2 <= diff;
+          mult2 <= F;
           need_mult <= 1;
           state <= OPX3;
         end
@@ -208,6 +210,7 @@ module point_add (
 
       OPX3: begin
         if (mult_done) begin
+          $display("product: %0d", product);
           x3 = product;
           mult1 <= G;
           mult2 <= H;
@@ -243,12 +246,6 @@ module point_add (
           state = INIT;
         end
       end
-      
-      OPDONE: begin
-        done = 1;
-        state = INIT;
-      end
-
     endcase
   end
 
