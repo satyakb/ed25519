@@ -2,7 +2,7 @@
 `define b2 512
 
 module seq_mult_256bit (
-  output  [`b2-1:0] product,
+  output reg [`b2-1:0] product,
   output   reg     done2,
   input   [`b-1:0] a,
   input   [`b-1:0] b,
@@ -10,7 +10,7 @@ module seq_mult_256bit (
   input         start
 );
 
-  reg [`b2-1:0] product;
+//  reg [`b2-1:0] product;
   reg [`b-1:0] multiplicand;
   reg [`b-1:0] delay;
 
@@ -41,12 +41,14 @@ module seq_mult_256bit (
   localparam OP1 = 3'd1;
   localparam OP2 = 3'd2;
   localparam OP3 = 3'd3;
+  localparam OP4 = 3'd4;
 
   reg [2:0] state = INIT;
 
   always @(posedge clk) begin
     case (state)
       INIT: begin
+        done2 = 0;
         if (start) begin
           delay = `b'b0;
           delay[`b-1] = 1'b1;
@@ -86,9 +88,14 @@ module seq_mult_256bit (
         mod_start = 0;
         if (mod_done) begin
           product = mod;
-          done2 = 1;
-          state = INIT;
+//          done2 = 1;
+          state = OP4;
         end
+      end
+      
+      OP4: begin
+        done2 = 1;
+        state = INIT;
       end
 
     endcase

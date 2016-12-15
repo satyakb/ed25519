@@ -46,9 +46,9 @@ initial begin
   @(negedge clk);
   a = `b'd0;
   a[`b-1] = 1'b1;
-  b = `b'd54;
+  b = `q - 1;
   start = 1;
-  $display("a: %0x", a);
+  $display("a: %0d", a);
   $display("b: %0d", b);
 
   @(negedge clk);

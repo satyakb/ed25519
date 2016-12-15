@@ -12,18 +12,17 @@ always #100 clk = ~clk;
 
 
 //inputs to test are reg type;
-reg enable, rst;
+reg enable, start;
 reg [`b-1:0] x1, y1, z1, t1;
 reg [`b-1:0] x2, y2, z2, t2;
 
 // outputs
 wire done;
-wire signed [2*`b-1:0] x3, y3, z3, t3;
+wire signed [`b-1:0] x3, y3, z3, t3;
 
 point_add pa (
   .clk(clk),
-  .enable(enable),
-  .rst(rst),
+  .start(start),
   .x1(x1), .y1(y1), .z1(z1), .t1(t1),
   .x2(x2), .y2(y2), .z2(z2), .t2(t2),
   .done(done),
@@ -33,7 +32,6 @@ point_add pa (
 initial begin
   $display("<< Starting Simulation >>\n");
   clk = 1'b0;
-  rst = 1;
 
   @(negedge clk);
   x1 = `b'd3;
@@ -44,11 +42,10 @@ initial begin
   z2 = `b'd8;
   t1 = `b'd9;
   t2 = `b'd10;
-  enable = 0;
+  start = 1;
 
   @(negedge clk);
-  enable = 1;
-  rst = 0;
+  start = 0;
 
   @(posedge done);
   $display("x3: %0d", x3);

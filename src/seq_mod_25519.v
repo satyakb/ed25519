@@ -21,6 +21,7 @@ module seq_mod_25519 (clk, start, x, mod, done);
   localparam OP3 = 3'd3;
   localparam OP4 = 3'd4;
   localparam OP5 = 3'd5;
+  localparam OP6 = 3'd6;
 
   reg [2:0] state = INIT;
 
@@ -74,12 +75,19 @@ module seq_mod_25519 (clk, start, x, mod, done);
         if (count == 2'b10) begin
           intermediate = sum;
           state = OP1;
+          count = count >> 1;
         end else begin
           mod = sum;
-          state = INIT;
+          state = OP6;
         end
-        count = count >> 1;
       end
+      
+      // Need extra cycle to commit value to mod
+      OP6: begin
+        count = count >> 1;
+        state = INIT;
+      end
+      
     endcase
   end
 endmodule
