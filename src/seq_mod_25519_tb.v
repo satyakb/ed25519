@@ -1,8 +1,8 @@
 `default_nettype none
 `timescale 1 ns / 100 ps
 
-`define b 256
-`define b2 512
+`define b 257
+`define b2 514
 `define q 255'd57896044618658097711785492504343953926634992332820282019728792003956564819949
 `define l 253'd7237005577332262213973186563042994240857116359379907606001950938285454250989
 
@@ -17,7 +17,7 @@ wire  [`b-1:0] mod;
 wire        done;
 
 // Inputs
-reg   [`b2-1:0] x ;
+reg signed [`b2-1:0] x ;
 reg         start;
 
 //inputs to test are reg type;
@@ -43,10 +43,12 @@ initial begin
   clk = 1'b0;
 
   @(negedge clk);
-  x =`b2'b0;
-  x[`b2-1] = 1'b1;
+  x =`b2'd10;
+  x = -x;
+//  x[`b2-1] = 1'b1;
   start = 1;
   $display("x: %0d", x);
+  $display("x: %0x", x);
 
   @(negedge clk);
   start = 0;

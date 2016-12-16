@@ -1,7 +1,7 @@
 `default_nettype none
 
-`define b 256
-`define b2 512
+`define b 257
+`define b2 514
 `define q 255'd57896044618658097711785492504343953926634992332820282019728792003956564819949
 `define l 253'd7237005577332262213973186563042994240857116359379907606001950938285454250989
 
@@ -37,13 +37,14 @@ module point_add (
   localparam OPZ3 = 4'd9;
   localparam OPT3 = 4'd10;
   localparam OPDONE = 4'd11;
+  localparam OPC2 = 4'd12;
+  localparam OPD2 = 4'd13;
   reg [3:0] state = INIT;
 
   reg need_mult;
 
   // Multiplier module
-  reg mult_start;
-  initial mult_start = 0;
+  reg mult_start = 0;
   reg [`b-1:0] mult1, mult2;
   wire mult_done;
   wire [`b2-1:0] product;
@@ -76,7 +77,7 @@ module point_add (
   reg [3:0] need_add;
 
   // Intermediate values
-  reg [`b-1:0] A, B, C, D, E, F, G, H;
+  reg signed [`b-1:0] A, B, C, D, E, F, G, H;
 
   always @(posedge clk) begin
     if (need_mult) begin
@@ -134,11 +135,13 @@ module point_add (
           add2 <= x1;
           need_add <= {1'b0, need_add[3:1]};
         end else if (need_add == 4) begin
+          $display("mult1: %0d", sum);
           mult1 = sum;
           add1 <= y2;
           add2 <= x2;
           need_add <= {1'b0, need_add[3:1]};
         end else if (need_add == 2) begin
+          $display("mult2: %0d", sum);
           mult2 = sum;
           need_add <= {1'b0, need_add[3:1]};
         end else if (need_add == 1) begin
@@ -158,6 +161,19 @@ module point_add (
 
       OPC: begin
         if (mult_done) begin
+          // C = product;
+          // $display("C: %0d", C);
+          mult1 <= `b'd74191411869338878686276167017509130379084227759686438032777571066171880567110;
+          mult2 <= product;
+          // mult1 <= z1;
+          // mult2 <= z2;
+          need_mult <= 1;
+          state = OPC2;
+        end
+      end
+
+      OPC2: begin
+        if (mult_done) begin
           C = product;
           $display("C: %0d", C);
           mult1 <= z1;
@@ -168,6 +184,18 @@ module point_add (
       end
 
       OPD: begin
+        if (mult_done) begin
+          mult1 <= `b'd2;
+          mult2 <= product;
+          // D = product;
+          // $display("D: %0d", D);
+          need_mult <= 1;
+          // need_add <= 4'b1000;
+          state = OPD2;
+        end
+      end
+
+      OPD2: begin
         if (mult_done) begin
           D = product;
           $display("D: %0d", D);
@@ -210,7 +238,6 @@ module point_add (
 
       OPX3: begin
         if (mult_done) begin
-          $display("product: %0d", product);
           x3 = product;
           mult1 <= G;
           mult2 <= H;

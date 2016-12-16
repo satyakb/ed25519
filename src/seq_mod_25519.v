@@ -1,5 +1,5 @@
-`define b 256
-`define b2 512
+`define b 257
+`define b2 514
 
 module seq_mod_25519 (clk, start, x, mod, done);
   input clk, start;
@@ -8,9 +8,9 @@ module seq_mod_25519 (clk, start, x, mod, done);
   output wire done;
   output reg [`b-1:0] mod;
 
-  reg [`b-1:0] r;
-  reg [300:0] q;
-  reg [`b2-1:0] intermediate;
+  reg signed [`b-1:0] r;
+  reg signed [300:0] q;
+  reg signed [`b2-1:0] intermediate;
 
   reg [1:0] count;
   assign done = !(| count);
@@ -25,9 +25,8 @@ module seq_mod_25519 (clk, start, x, mod, done);
 
   reg [2:0] state = INIT;
 
-  reg [`b2-1:0] add1, add2;
-  wire [`b2-1:0] sum;
-
+  reg signed [`b2-1:0] add1, add2;
+  wire signed [`b2-1:0] sum;
   seq_add_512bit seq_add(
     .a(add1),
     .b(add2),
@@ -37,16 +36,17 @@ module seq_mod_25519 (clk, start, x, mod, done);
   always @(posedge clk) begin
     case (state)
       INIT: begin
+        count <= 2'b10;
         if (start) begin
           intermediate <= x;
-          count <= 2'b10;
+          // count <= 2'b10;
           state = OP1;
         end
       end
 
       OP1: begin
         r = intermediate[254:0];  // r = x mod 2^255
-        q = intermediate >> 255;  // q = floor(x / 2^255)
+        q = intermediate >>> 255;  // q = floor(x / 2^255)
         state = OP2;
       end
 
@@ -93,9 +93,9 @@ module seq_mod_25519 (clk, start, x, mod, done);
 endmodule
 
 module seq_add_512bit (a, b, sum);
-  input [`b2-1:0] a;
-  input [300:0] b;
-  output wire [`b2-1:0] sum;
+  input signed [`b2-1:0] a;
+  input signed [300:0] b;
+  output wire signed [`b2-1:0] sum;  // TODO: Might need to be longer
 
   assign sum = a + b;
 endmodule
